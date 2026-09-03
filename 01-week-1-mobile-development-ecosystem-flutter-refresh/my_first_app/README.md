@@ -4,6 +4,7 @@ Latihan Mandiri
 Praktikum
 
 Mini Assignment
+![mini](screenshots/
 
 # Refleksi
 1. Kapan native lebih tepat dipilih daripada cross-platform?
