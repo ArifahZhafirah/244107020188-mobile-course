@@ -1,5 +1,7 @@
-Latihan Mandiri 
+# Latihan Mandiri 
 
+
+![mini](/01-week-1-mobile-development-ecosystem-flutter-refresh/Screenshot/LatihanMandiri.png)
 
 # Praktikum
 
