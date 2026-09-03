@@ -1,10 +1,16 @@
 Latihan Mandiri 
 
 
-Praktikum
+# Praktikum
 
-Mini Assignment
-![mini](screenshots/
+
+![mini](/01-week-1-mobile-development-ecosystem-flutter-refresh/Screenshot/Praktikum.jpeg)
+
+
+# Mini Assignment
+
+
+![mini](/01-week-1-mobile-development-ecosystem-flutter-refresh/Screenshot/Assignment.jpeg)
 
 # Refleksi
 1. Kapan native lebih tepat dipilih daripada cross-platform?
