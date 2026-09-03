@@ -1,70 +1,77 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const ProfileApp());
+void main() => runApp(const DashboardApp());
 
-class ProfileApp extends StatelessWidget {
-  const ProfileApp({super.key});
+class DashboardApp extends StatelessWidget {
+  const DashboardApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(child: ProfileCard()),
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
+      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark, colorSchemeSeed: Colors.indigo),
+      themeMode: ThemeMode.system,
+      home: const DashboardPage(),
+    );
+  }
+}
+
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({
+    required this.isDark,
+    required this.onDarkChanged,
+    super.key,
+  });
+  final bool isDark;
+  final ValueChanged<bool> onDarkChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Student Dashboard'),
+        actions: [
+          Row(
+            children: [
+              Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+              const SizedBox(width: 4),
+              CupertinoSwitch(
+                value: isDark,
+                onChanged: onDarkChanged,
+              ),
+              const SizedBox(width: 12),
+            ],
+          ),
+        ],
+      ),
+      body: LayoutBuilder(
+        // ... kode GridView sebelumnya, tidak berubah
       ),
     );
   }
 }
 
-class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key});
+class DashboardApp extends StatefulWidget {
+  const DashboardApp({super.key});
+
+  @override
+  State<DashboardApp> createState() => DashboardAppState();
+}
+
+class DashboardAppState extends State<DashboardApp> {
+  bool isDark = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 320,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.indigo.shade50,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Coba ubah ke MainAxisSize.max
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(child: Icon(Icons.person)),
-              const SizedBox(width: 12),
-              // KEMBALI MENGGUNAKAN EXPANDED (poin 1)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Nama Mahasiswa',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Arifah Zhafirah Wikananda'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Row(children: [
-            Expanded(child: Text('NIM')),
-            Text('244107020188'),
-          ]),
-          const SizedBox(height: 4),
-          const Row(children: [
-            Expanded(child: Text('Kelas')),
-            Text('2F'),
-          ]),
-          const SizedBox(height: 4),
-          // TAMBAHAN: Baris Email (poin 3)
-          const Row(children: [
-            Expanded(child: Text('Email')),
-            Text('arifah@example.com'),
-          ]),
-        ],
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
+      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark, colorSchemeSeed: Colors.indigo),
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      home: DashboardPage(
+        isDark: isDark,
+        onDarkChanged: (value) => setState(() => isDark = value),
       ),
     );
   }
