@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Profil {
   String nama;
   String nim;
-  String email; // Email boleh kosong (nullable)
+  String? email; // Email boleh kosong (nullable)
   
   Profil({
     required this.nama,
