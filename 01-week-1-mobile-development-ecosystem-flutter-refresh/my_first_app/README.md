@@ -5,7 +5,7 @@ Praktikum
 
 Mini Assignment
 
-#Refleksi
+# Refleksi
 1. Kapan native lebih tepat dipilih daripada cross-platform?
 Jawab: Native lebih baik dipilih ketika aplikasi membutuhkan performa tinggi seperti game atau edit video, atau perlu akses ke fitur hardware terbaru yang belum didukung cross-platform. Selain itu, jika aplikasi harus mengikuti desain khusus iOS atau Android secara sempurna, atau untuk proyek jangka panjang dengan tim yang sudah ahli di platform tertentu, native lebih tepat meskipun biayanya lebih mahal.
 
