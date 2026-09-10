@@ -2,27 +2,27 @@
 // NIM: 244107020188
 // Kelas: 2F
 // Tugas: Academic Overview Dashboard
-// Revisi: perbaikan hasil AI Prompt Challenge
-//   1. colorScheme.surfaceVariant -> surfaceContainerHighest (surfaceVariant deprecated sejak Flutter 3.18)
-//   2. Semantics label pada foto profil (aksesibilitas screen reader)
-//   3. overflow: TextOverflow.ellipsis + maxLines pada Text judul/nilai di kartu info
-//      (pencegahan overflow pola "Expanded tidak melindungi Text di dalamnya")
+// Revisi: Refactoring Challenge
 
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+/// Breakpoint untuk menentukan layout mobile dan desktop.
+const double kWideBreakpoint = 600.0;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DashboardApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+/// Widget utama aplikasi.
+class DashboardApp extends StatefulWidget {
+  const DashboardApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<DashboardApp> createState() => _DashboardAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _DashboardAppState extends State<DashboardApp> {
   bool isDark = false;
 
   @override
@@ -30,16 +30,20 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Academic Overview',
+
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.deepPurple,
       ),
+
       darkTheme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.dark,
       ),
+
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+
       home: DashboardPage(
         isDark: isDark,
         onDarkChanged: (value) {
@@ -52,6 +56,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
+/// Halaman utama dashboard.
 class DashboardPage extends StatelessWidget {
   const DashboardPage({
     super.key,
@@ -84,9 +89,11 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
+
       body: LayoutBuilder(
         builder: (context, constraints) {
-          bool isSmall = constraints.maxWidth < 600;
+          final bool isSmall =
+              constraints.maxWidth < kWideBreakpoint;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -95,8 +102,14 @@ class DashboardPage extends StatelessWidget {
               children: [
                 _buildProfile(context),
                 const SizedBox(height: 20),
-                _buildInfoCards(context, isSmall),
+
+                _buildInfoCards(
+                  context,
+                  isSmall,
+                ),
+
                 const SizedBox(height: 20),
+
                 _buildProgress(context),
               ],
             ),
@@ -106,15 +119,21 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // ============================================
+  // ============================================================
   // WIDGET PROFIL
-  // ============================================
+  // ============================================================
+
   Widget _buildProfile(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF6D28D9)],
+          colors: [
+            Color(0xFF7C3AED),
+            Color(0xFF6D28D9),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -122,47 +141,63 @@ class DashboardPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // FIX: Semantics label agar screen reader mengumumkan foto profil,
-          // bukan diam saja atau hanya membaca "image".
           Semantics(
             label: 'Foto profil Arifah Zhafirah Wikananda',
             child: const CircleAvatar(
               radius: 35,
-              backgroundImage: NetworkImage(
-                'https://ui-avatars.com/api/?name=Arifah+Zhafirah&background=7C3AED&color=fff&size=128',
+              backgroundColor: Colors.white,
+              child: Text(
+                'AZ',
+                style: TextStyle(
+                  color: Color(0xFF7C3AED),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
               ),
             ),
           ),
+
           const SizedBox(width: 16),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Arifah Zhafirah Wikananda',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white,
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+
                 const SizedBox(height: 4),
-                const Text(
+
+                Text(
                   '244107020188 · Kelas 2F',
-                  style: TextStyle(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.white70,
-                    fontSize: 14,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+
                 const SizedBox(height: 8),
+
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
                   children: [
-                    _buildChip(Icons.school, 'Semester 4'),
-                    _buildChip(Icons.star, 'GPA 3.85'),
+                    _buildChip(
+                      context,
+                      Icons.school,
+                      'Semester 4',
+                    ),
+                    _buildChip(
+                      context,
+                      Icons.star,
+                      'GPA 3.85',
+                    ),
                   ],
                 ),
               ],
@@ -173,20 +208,27 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // ============================================
+  // ============================================================
   // WIDGET CHIP
-  // ============================================
-  Widget _buildChip(IconData icon, String label) {
+  // ============================================================
+
+  Widget _buildChip(
+    BuildContext context,
+    IconData icon,
+    String label,
+  ) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.25),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -197,12 +239,13 @@ class DashboardPage extends StatelessWidget {
             size: 14,
             color: Colors.white,
           ),
+
           const SizedBox(width: 4),
+
           Text(
             label,
-            style: const TextStyle(
+            style: theme.textTheme.labelSmall?.copyWith(
               color: Colors.white,
-              fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -211,214 +254,121 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // ============================================
+  // ============================================================
   // WIDGET KARTU INFORMASI
-  // ============================================
-  Widget _buildInfoCards(BuildContext context, bool isSmall) {
-    final List<Map<String, dynamic>> cardData = [
-      {
-        'icon': Icons.book,
-        'title': 'Mata Kuliah',
-        'value': '12',
-        'subtitle': 'Aktif',
-        'color': Colors.blue,
-      },
-      {
-        'icon': Icons.assignment,
-        'title': 'Tugas',
-        'value': '8',
-        'subtitle': 'Menunggu',
-        'color': Colors.orange,
-      },
-      {
-        'icon': Icons.grade,
-        'title': 'Nilai Rata-rata',
-        'value': 'A-',
-        'subtitle': '85.5%',
-        'color': Colors.green,
-      },
-      {
-        'icon': Icons.calendar_today,
-        'title': 'Kehadiran',
-        'value': '92%',
-        'subtitle': 'Bulan Ini',
-        'color': Colors.purple,
-      },
+  // ============================================================
+
+  Widget _buildInfoCards(
+    BuildContext context,
+    bool isSmall,
+  ) {
+    const List<InfoCard> cards = [
+      InfoCard(
+        icon: Icons.book,
+        title: 'Mata Kuliah',
+        value: '12',
+        subtitle: 'Aktif',
+        color: Colors.blue,
+      ),
+
+      InfoCard(
+        icon: Icons.assignment,
+        title: 'Tugas',
+        value: '8',
+        subtitle: 'Menunggu',
+        color: Colors.orange,
+      ),
+
+      InfoCard(
+        icon: Icons.grade,
+        title: 'Nilai Rata-rata',
+        value: 'A-',
+        subtitle: '85.5%',
+        color: Colors.green,
+      ),
+
+      InfoCard(
+        icon: Icons.calendar_today,
+        title: 'Kehadiran',
+        value: '92%',
+        subtitle: 'Bulan Ini',
+        color: Colors.purple,
+      ),
     ];
+
+    // ==========================================================
+    // MOBILE
+    // ==========================================================
 
     if (isSmall) {
       return Column(
-        children: cardData.map((data) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _buildSingleCard(
-              context,
-              data['icon'],
-              data['title'],
-              data['value'],
-              data['subtitle'],
-              data['color'],
-            ),
-          );
-        }).toList(),
-      );
-    } else {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              children: [
-                _buildSingleCard(
-                  context,
-                  cardData[0]['icon'],
-                  cardData[0]['title'],
-                  cardData[0]['value'],
-                  cardData[0]['subtitle'],
-                  cardData[0]['color'],
-                ),
-                const SizedBox(height: 12),
-                _buildSingleCard(
-                  context,
-                  cardData[2]['icon'],
-                  cardData[2]['title'],
-                  cardData[2]['value'],
-                  cardData[2]['subtitle'],
-                  cardData[2]['color'],
-                ),
-              ],
+          for (final card in cards)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: card,
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              children: [
-                _buildSingleCard(
-                  context,
-                  cardData[1]['icon'],
-                  cardData[1]['title'],
-                  cardData[1]['value'],
-                  cardData[1]['subtitle'],
-                  cardData[1]['color'],
-                ),
-                const SizedBox(height: 12),
-                _buildSingleCard(
-                  context,
-                  cardData[3]['icon'],
-                  cardData[3]['title'],
-                  cardData[3]['value'],
-                  cardData[3]['subtitle'],
-                  cardData[3]['color'],
-                ),
-              ],
-            ),
-          ),
         ],
       );
     }
-  }
 
-  Widget _buildSingleCard(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String value,
-    String subtitle,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    // ==========================================================
+    // DESKTOP
+    // ==========================================================
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              cards[0],
+              const SizedBox(height: 12),
+              cards[2],
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+        ),
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: Column(
+            children: [
+              cards[1],
+              const SizedBox(height: 12),
+              cards[3],
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // FIX: overflow handling — Expanded di level Row luar tidak
-                // otomatis melindungi Text ini dari teks yang lebih panjang
-                // (mis. kalau title/value nanti diisi dari data dinamis).
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  // ============================================
-  // WIDGET PROGRESS
-  // ============================================
+  // ============================================================
+  // WIDGET PROGRESS AKADEMIK
+  // ============================================================
+
   Widget _buildProgress(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        // FIX: surfaceVariant deprecated sejak Flutter 3.18, digantikan
-        // surfaceContainerHighest pada pembaruan warna Material 3 (Flutter 3.22+).
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Progress Akademik',
-            style: TextStyle(
-              fontSize: 18,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
+
           const SizedBox(height: 12),
+
           Row(
             children: [
               Expanded(
@@ -429,7 +379,9 @@ class DashboardPage extends StatelessWidget {
                   Colors.green,
                 ),
               ),
+
               const SizedBox(width: 8),
+
               Expanded(
                 child: _buildProgressItem(
                   context,
@@ -438,7 +390,9 @@ class DashboardPage extends StatelessWidget {
                   Colors.orange,
                 ),
               ),
+
               const SizedBox(width: 8),
+
               Expanded(
                 child: _buildProgressItem(
                   context,
@@ -454,35 +408,133 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
+  // ============================================================
+  // ITEM PROGRESS
+  // ============================================================
+
   Widget _buildProgressItem(
     BuildContext context,
     String label,
     String value,
     Color color,
   ) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: theme.textTheme.titleLarge?.copyWith(
               color: color,
+              fontWeight: FontWeight.bold,
             ),
           ),
+
           const SizedBox(height: 4),
+
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Widget reusable untuk kartu informasi akademik.
+class InfoCard extends StatelessWidget {
+  const InfoCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.subtitle,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+  final String subtitle;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 28,
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+
+                Text(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+
+                Text(
+                  subtitle,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
             ),
           ),
         ],

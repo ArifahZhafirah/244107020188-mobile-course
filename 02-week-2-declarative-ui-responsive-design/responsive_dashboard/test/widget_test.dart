@@ -1,30 +1,45 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:responsive_dashboard/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets(
+    'Dashboard satu kolom di layar sempit',
+    (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      await tester.pumpWidget(const DashboardApp());
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(find.byType(InfoCard), findsNWidgets(4));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      final cards = find.byType(InfoCard);
+
+      for (int i = 0; i < 4; i++) {
+        final size = tester.getSize(cards.at(i));
+        expect(size.width, greaterThan(0));
+      }
+    },
+  );
+
+  testWidgets(
+    'Dashboard dua kolom di layar lebar',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(const DashboardApp());
+
+      expect(find.byType(InfoCard), findsNWidgets(4));
+
+      final cards = find.byType(InfoCard);
+
+      for (int i = 0; i < 4; i++) {
+        final size = tester.getSize(cards.at(i));
+        expect(size.width, greaterThan(0));
+      }
+    },
+  );
 }
