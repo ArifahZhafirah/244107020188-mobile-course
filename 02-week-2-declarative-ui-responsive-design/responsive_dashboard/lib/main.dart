@@ -2,6 +2,11 @@
 // NIM: 244107020188
 // Kelas: 2F
 // Tugas: Academic Overview Dashboard
+// Revisi: perbaikan hasil AI Prompt Challenge
+//   1. colorScheme.surfaceVariant -> surfaceContainerHighest (surfaceVariant deprecated sejak Flutter 3.18)
+//   2. Semantics label pada foto profil (aksesibilitas screen reader)
+//   3. overflow: TextOverflow.ellipsis + maxLines pada Text judul/nilai di kartu info
+//      (pencegahan overflow pola "Expanded tidak melindungi Text di dalamnya")
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -102,7 +107,7 @@ class DashboardPage extends StatelessWidget {
   }
 
   // ============================================
-  // WIDGET PROFIL - DIPERBAIKI
+  // WIDGET PROFIL
   // ============================================
   Widget _buildProfile(BuildContext context) {
     return Container(
@@ -117,10 +122,15 @@ class DashboardPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 35,
-            backgroundImage: NetworkImage(
-              'https://ui-avatars.com/api/?name=Arifah+Zhafirah&background=7C3AED&color=fff&size=128',
+          // FIX: Semantics label agar screen reader mengumumkan foto profil,
+          // bukan diam saja atau hanya membaca "image".
+          Semantics(
+            label: 'Foto profil Arifah Zhafirah Wikananda',
+            child: const CircleAvatar(
+              radius: 35,
+              backgroundImage: NetworkImage(
+                'https://ui-avatars.com/api/?name=Arifah+Zhafirah&background=7C3AED&color=fff&size=128',
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -135,6 +145,7 @@ class DashboardPage extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 const Text(
@@ -143,9 +154,9 @@ class DashboardPage extends StatelessWidget {
                     color: Colors.white70,
                     fontSize: 14,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-                // CHIP dengan Wrap - SEKARANG TERLIHAT!
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
@@ -163,7 +174,7 @@ class DashboardPage extends StatelessWidget {
   }
 
   // ============================================
-  // WIDGET CHIP (dipisah biar rapi)
+  // WIDGET CHIP
   // ============================================
   Widget _buildChip(IconData icon, String label) {
     return Container(
@@ -347,12 +358,17 @@ class DashboardPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // FIX: overflow handling — Expanded di level Row luar tidak
+                // otomatis melindungi Text ini dari teks yang lebih panjang
+                // (mis. kalau title/value nanti diisi dari data dinamis).
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
                 Text(
                   value,
@@ -360,6 +376,8 @@ class DashboardPage extends StatelessWidget {
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
                 Text(
                   subtitle,
@@ -367,6 +385,8 @@ class DashboardPage extends StatelessWidget {
                     fontSize: 12,
                     color: Colors.grey[500],
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ],
             ),
@@ -383,7 +403,9 @@ class DashboardPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        // FIX: surfaceVariant deprecated sejak Flutter 3.18, digantikan
+        // surfaceContainerHighest pada pembaruan warna Material 3 (Flutter 3.22+).
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
