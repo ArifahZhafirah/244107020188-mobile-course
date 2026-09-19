@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/todo_provider.dart';
+import '../widgets/todo_tile.dart';
 import 'product_page.dart';
 
 class TodoPage extends ConsumerWidget {
@@ -8,45 +9,75 @@ class TodoPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todoListProvider);
+    final todos = ref.watch(filteredTodosProvider);
+    final filter = ref.watch(todoFilterProvider);
 
     return Scaffold(
       appBar: AppBar(
-  title: const Text('ToDo Riverpod'),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.shopping_cart),
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ProductPage()),
-      ),
-    ),
-  ],
-),
-      body: todos.isEmpty
-          ? const Center(child: Text('Belum ada tugas'))
-          : ListView.builder(
-              itemCount: todos.length,
-              itemBuilder: (context, index) => ListTile(
-                leading: Checkbox(
-                  value: todos[index].done,
-                  onChanged: (_) =>
-                      ref.read(todoListProvider.notifier).toggle(index),
-                ),
-                title: Text(
-                  todos[index].title,
-                  style: TextStyle(
-                      decoration: todos[index].done
-                          ? TextDecoration.lineThrough
-                          : null),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () =>
-                      ref.read(todoListProvider.notifier).remove(index),
-                ),
-              ),
+        title: const Text('ToDo Riverpod'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProductPage()),
             ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Filter chips
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            child: Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('Semua'),
+                  selected: filter == TodoFilter.all,
+                  onSelected: (_) =>
+                      ref.read(todoFilterProvider.notifier).set(TodoFilter.all),
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Belum selesai'),
+                  selected: filter == TodoFilter.active,
+                  onSelected: (_) => ref
+                      .read(todoFilterProvider.notifier)
+                      .set(TodoFilter.active),
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Selesai'),
+                  selected: filter == TodoFilter.completed,
+                  onSelected: (_) => ref
+                      .read(todoFilterProvider.notifier)
+                      .set(TodoFilter.completed),
+                ),
+              ],
+            ),
+          ),
+
+          // Daftar tugas
+          Expanded(
+            child: todos.isEmpty
+                ? const Center(child: Text('Belum ada tugas'))
+                : ListView.builder(
+                    itemCount: todos.length,
+                    itemBuilder: (context, index) {
+                      final todo = todos[index];
+                      return TodoTile(
+                        todo: todo,
+                        onToggle: () =>
+                            ref.read(todoListProvider.notifier).toggle(todo),
+                        onRemove: () =>
+                            ref.read(todoListProvider.notifier).remove(todo),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context, ref),
         child: const Icon(Icons.add),
