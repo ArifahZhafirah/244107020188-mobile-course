@@ -1,17 +1,13 @@
-# week3_todo
+# Praktikum 2 - Aplikasi ToDo dengan Riverpod
 
-A new Flutter project.
 
-## Getting Started
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum2a.png)
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum2b.png)
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum2c.png)
+
+
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum2d.png)
