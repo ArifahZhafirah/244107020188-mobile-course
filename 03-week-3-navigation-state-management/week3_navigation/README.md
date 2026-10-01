@@ -1,17 +1,8 @@
-# week3_navigation
+# Praktikum 1 - Aplikasi multi-page dengan GoRouter
 
-A new Flutter project.
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum1a.png)
 
-## Getting Started
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum1b.png)
 
-This project is a starting point for a Flutter application.
+![mini](/03-week-3-navigation-state-management/Screenshot/Praktikum1c.png)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
