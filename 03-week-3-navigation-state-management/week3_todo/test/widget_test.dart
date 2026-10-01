@@ -8,16 +8,13 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     expect(find.text('Belum ada tugas'), findsOneWidget);
 
-    // Tap tombol + untuk buka dialog
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    // Isi TextField dan tap "Tambah"
     await tester.enterText(find.byType(TextField), 'Kerjakan PR minggu 3');
     await tester.tap(find.text('Tambah'));
-    await tester.pumpAndSettle();   // ← INI KUNCI PERBAIKANNYA
+    await tester.pumpAndSettle();
 
-    // Verifikasi tugas muncul (cuma di list, bukan di TextField)
     expect(find.text('Kerjakan PR minggu 3'), findsOneWidget);
   });
 }
