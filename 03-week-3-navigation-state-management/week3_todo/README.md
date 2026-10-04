@@ -27,3 +27,12 @@
 
 
 # Praktikum AI
+
+
+![mini](/03-week-3-navigation-state-management/Screenshot/AI.png)
+
+
+![mini](/03-week-3-navigation-state-management/Screenshot/AI2a.png)
+
+
+![mini](/03-week-3-navigation-state-management/Screenshot/AI2b.png)
