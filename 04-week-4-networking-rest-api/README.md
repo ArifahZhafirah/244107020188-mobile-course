@@ -165,21 +165,16 @@ Requirements:
 Jelaskan setiap bagian kode dalam komentar.
 ```
 
-### Hasil verifikasi
+### Hasil verifikasi AI
 
-| Poin verifikasi | Temuan | Tindakan perbaikan |
-| --- | --- | --- |
-| UI memanggil Dio langsung? | Tidak, akses data lewat `CommentRepository` + provider | Sesuai, dipertahankan |
-| `fromJson` aman null? | Sebagian; `email` dan `name` sempat memakai cast langsung `as String` | Diubah ke pola `as String? ?? ''` seperti pada `Post` |
-| Semua `DioExceptionType` dipetakan? | Awalnya hanya `connectionTimeout` dan `badResponse` | Ditambahkan `sendTimeout`, `receiveTimeout`, `connectionError`, dan cabang default |
-| `baseUrl`/timeout terpusat? | Tidak, timeout ditulis ulang di dalam method repository | Dipindahkan ke `createDio()` di `api_client.dart` sehingga satu sumber konfigurasi |
-| Test menguji field hilang? | Hanya happy path pada versi awal | Ditambahkan test field hilang + edge case tipe salah (`id` berupa String) |
-| `flutter analyze` & `flutter test` lolos? | Awalnya ada warning import tidak terpakai dan `print` di catch | Import dibersihkan, `print` dihapus, exception dibiarkan naik ke provider |
-
-Catatan tambahan: output AI juga sempat memakai retry default Riverpod sehingga test menggantung. Diperbaiki dengan `retry: (retryCount, error) => null` seperti pada `postListProvider`.
-
-Prompt, output awal AI, diff perbaikan, dan log testing disimpan pada folder `docs/`.
-
+| No | Pertanyaan Review | Hasil | 
+|----|-------------------|-------|
+| 1 | Apakah UI memanggil Dio secara langsung atau lewat repository? | UI tidak memanggil Dio langsung. Seluruh akses didelegasikan melalui `CommentRepository` dan `PostRepository`. | 
+| 2 | Apakah `fromJson` aman null, atau masih memakai cast langsung yang bisa crash? | Model awal (`Comment.fromJson`) sudah aman terhadap null, tetapi masih memakai cast langsung seperti `as num?` dan `as String?`. Ini bisa menyebabkan crash jika server mengembalikan tipe data yang meleset (misalnya `id` berupa `String`). `fromJson` di `lib/data/models/comment.dart` dirombak agar lebih tahan terhadap perbedaan tipe: `int.tryParse(json['id']?.toString() ?? '') ?? 0` dan `json['body']?.toString() ?? ''`. |
+| 3 | Apakah semua tipe `DioExceptionType` dipetakan ke pesan pengguna? | Ya. `lib/data/network_errors.dart` memetakan timeout, connectionError, hingga badResponse (404/401/403/500). |
+| 4 | Apakah `baseUrl`/timeout terpusat di satu client? | Ya. `baseUrl` disuntikkan secara terpusat pada Dio di `api_client.dart`. | 
+| 5 | Apakah test AI benar-benar menguji kasus field hilang? (tambahkan minimal 1 edge case) | Test AI sudah menguji field yang hilang. Ditambahkan 1 edge case baru di `test/comment_test.dart`: `'Comment.fromJson menangani tipe data yang salah dengan aman'`, yang sengaja memberi tipe salah (boolean pada `email`, String pada `id`) untuk membuktikan perbaikan pada poin 2. | 
+| 6 | Jalankan `flutter analyze` dan `flutter test`, apakah lolos? | `flutter analyze` melaporkan "No issues found!" dan `flutter test` lulus (hijau). | 
 ## 7. Testing
 
 `test/post_test.dart` menggunakan `FakePostRepository` yang meng-override `fetchPosts()` dan `fetchPostsPage()`, sehingga tidak ada request HTTP sungguhan di dalam test. Repository palsu diinjeksikan lewat `postRepositoryProvider.overrideWithValue(...)` pada `ProviderContainer`.
@@ -204,20 +199,45 @@ Cakupan test:
 
 ## 8. Checklist verifikasi mandiri
 
-- [x] UI tidak memanggil Dio langsung; semua akses data lewat repository + provider
-- [x] Empat state tampil benar: loading, error (+ retry), empty, success
-- [x] Pagination menambah data saat scroll, tanpa request ganda, dengan indikator akhir data
-- [x] `flutter analyze` tanpa issue dan seluruh test lulus
-- [x] Hasil AI diverifikasi dan didokumentasikan pada folder `docs/`
+| No | Kriteria | Keterangan |
+|----|----------|------------|
+| 1 | UI tidak memanggil Dio langsung | Semua akses data dari UI didelegasikan ke repository layer (`PostRepository` dan `CommentRepository`) melalui Provider. UI tidak memiliki referensi ke object `Dio` sama sekali. |
+| 2 | Empat state tampil benar (loading, error + retry, empty, success) | Memakai `.when()` pada `AsyncValue` dari Riverpod untuk mengelola state `loading`, `error` (dengan tombol refresh/retry), data kosong (empty), dan data berhasil (success) secara deklaratif. |
+| 3 | Pagination (data bertambah saat scroll, tidak ada request ganda, indikator akhir data) | Diterapkan terpusat di `PagedPostsNotifier` (`paged_posts.dart`). Request ganda diblokir dengan `if (state.isLoadingMore \|\| !state.hasMore) return;`, dan flag `hasMore` menandakan akhir data. |
+| 4 | `flutter analyze` tanpa issue dan semua test lulus | Kode mengikuti lint rules dari analisis statik dan tidak memakai try/catch sembarangan yang mengaburkan exception. |
+| 5 | Hasil AI diverifikasi dan didokumentasikan pada folder `docs/` | Dokumen ini dan `AI_Challenge.md` berada di folder `docs/` untuk merangkum proses pengerjaan. |
 
-## 9. Kesalahan umum yang dihindari
+## 9. Refleksi
 
-- Memanggil Dio langsung dari widget alih-alih lewat repository.
-- Menelan exception dengan `catch` kosong sehingga kegagalan tidak terlihat.
-- Menampilkan pesan teknis mentah (stack trace) kepada pengguna.
-- Lupa menangani empty state sehingga layar kosong tanpa penjelasan.
-- Tidak memasang timeout sehingga UI menggantung selamanya.
-- Melupakan guard `isLoadingMore` sehingga scroll memicu request ganda.
+### 1. Mengapa UI dilarang memanggil Dio langsung?
+
+| Aspek | Penjelasan |
+|-------|------------|
+| Alasan utama | Menegakkan pemisahan tanggung jawab (Separation of Concerns). UI hanya fokus pada tampilan dan tidak perlu tahu detail teknis jaringan seperti endpoint, timeout, atau parsing JSON. |
+| Dampak jika dilanggar: testability | Sangat sulit mem-mock HTTP call langsung di dalam widget test dibanding sekadar mem-mock class repository. |
+| Dampak jika dilanggar: duplikasi kode | Jika beberapa widget memanggil endpoint yang sama, konfigurasi API berulang. Menambah *interceptor* (misalnya token JWT) berarti mengubah setiap widget, padahal seharusnya cukup di satu file `ApiClient` atau repository. |
+
+### 2. Kapan pagination client-side cukup, dan kapan harus pagination server?
+
+| Jenis | Kapan Dipakai | Alasan |
+|-------|---------------|--------|
+| Client-side | Dataset kecil, terbatas, atau konstan dan cepat diunduh. | Semua data diunduh di awal lalu ditampilkan bertahap sehingga rendering UI tetap lancar. |
+| Server-side (`_page`/`_limit`) | Dataset sangat besar, berpotensi tak berujung (misalnya feed media sosial), atau terus diperbarui secara real-time. | Mencegah Out-Of-Memory di device, mengurangi latensi yang dirasakan user, serta meminimalkan beban bandwidth dan server. |
+
+### 3. Bagaimana exception repository menjadi `AsyncError`, dan kapan `try/catch` eksplisit dibutuhkan?
+
+| Situasi | Mekanisme | Penjelasan |
+|---------|-----------|------------|
+| Exception dilempar dari `build()` | Otomatis menjadi `AsyncError` | `AsyncNotifier` / `FutureProvider` pada Riverpod menangkap exception dari `build()` dan mengubahnya menjadi state `AsyncError`, yang ditangani di widget lewat `.when(error: (err, st) => ...)`. Tidak perlu `try/catch` berulang di UI. |
+| Aksi side-effect di luar `build()` | `try/catch` eksplisit tetap dibutuhkan | Contohnya tombol "Submit", `refresh()`, atau `loadNextPage()`. Method ini tidak dikelola otomatis seperti `build()`, sehingga exception harus ditangkap lalu disimpan ke state (misalnya `state = PagedPostsState(error: e)`) agar UI tahu fetch berikutnya gagal. |
+
+### 4. Bagian hasil AI yang diperbaiki
+
+| No | Bagian yang Diperbaiki | Masalah pada Hasil AI | Perbaikan | Alasan |
+|----|------------------------|-----------------------|-----------|--------|
+| 1 | Block `try/catch` di repository | AI membungkus return data Dio dengan `try/catch` lalu mengembalikan list kosong (`[]`) atau tipe generik `Result`. | Repository dibiarkan melempar (bubbling) error. | Error tidak tertelan (silent error), dan Riverpod dapat mendeteksinya sehingga widget Error dan Retry muncul. |
+| 2 | Auto-retry saat testing | Pada Riverpod v3, `FutureProvider` / `AsyncNotifier` di `providers.dart` menahan test karena mekanisme retry bawaan. | Menambahkan `retry: (retryCount, error) => null;` pada provider. | State error menjadi final dan langsung terbaca di test environment, sehingga test tidak hang menunggu batas percobaan. |
+| 3 | Pencegah race condition di pagination | AI membuat fetch halaman berikutnya tanpa mengecek apakah state sebelumnya masih loading. | Menambahkan `if (state.isLoadingMore \|\| !state.hasMore) return;` di awal `loadNextPage()`. | Mencegah request ganda sehingga memori dan request tidak membludak. |
 
 ## 10. Cara menjalankan
 
@@ -227,10 +247,3 @@ flutter pub get
 flutter run
 flutter test
 ```
-
-## Referensi
-
-- [Codelab Minggu 4: Networking & REST API](https://jti-polinema.github.io/flutter-codelab/04-minggu-4-networking-rest-api/index.html)
-- [Dio package](https://pub.dev/packages/dio)
-- [JSONPlaceholder](https://jsonplaceholder.typicode.com)
-- [Riverpod: AsyncNotifier dan AsyncValue](https://riverpod.dev/docs/concepts/async_notifiers)
