@@ -194,10 +194,11 @@ Cakupan test:
 - Provider error dengan repository palsu (`isA<DioException>()`).
 - Edge case tambahan milik sendiri untuk tipe data yang tidak sesuai dokumentasi.
 
-```bash
-flutter analyze
-flutter test
-```
+| flutter analyze | flutter test |
+| --- | --- |
+| <img src="screenshots/analyze.png" width="600"> | <img src="screenshots/test.png" width="600"> |
+
+
 
 `flutter analyze` selesai tanpa issue, dan seluruh 5 test lulus.
 
