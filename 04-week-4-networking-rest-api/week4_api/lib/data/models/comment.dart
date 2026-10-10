@@ -16,11 +16,11 @@ class Comment {
   // fromJson aman null sesuai requirement codelab
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
-      postId: (json['postId'] as num?)?.toInt() ?? 0,
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: json['name'] as String? ?? '',
-      email: json['email'] as String? ?? '',
-      body: json['body'] as String? ?? '',
+      postId: int.tryParse(json['postId']?.toString() ?? '') ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      body: json['body']?.toString() ?? '',
     );
   }
 }
