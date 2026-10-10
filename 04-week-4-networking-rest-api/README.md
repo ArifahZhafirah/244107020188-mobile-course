@@ -1,4 +1,4 @@
-# Mini Project - Networking & REST API
+# 04 | Networking & REST API
 
 ## Tujuan
 Memahami konsep HTTP, REST API, dan JSON. Mengimplementasikan Repository Pattern dan State Management menggunakan Riverpod untuk menangani *Loading*, *Error*, *Empty*, dan *Success* states, serta pagination.
@@ -16,12 +16,38 @@ Memahami konsep HTTP, REST API, dan JSON. Mengimplementasikan Repository Pattern
 - **GoRouter** (Routing)
 
 ## Cara Menjalankan
-1. Pastikan Anda berada di direktori `week4_api`.
-2. Jalankan `flutter pub get` untuk mengunduh dependencies.
-3. Jalankan `flutter run` untuk meluncurkan aplikasi di emulator atau browser.
+1. Masuk ke dalam direktori aplikasi: `cd week4_api`
+2. Unduh dependencies: `flutter pub get`
+3. Jalankan aplikasi: `flutter run`
 
-## Hasil yang Dicapai
-Semua fitur dari Praktikum 1 hingga Praktikum 4 (Refactoring) dan AI Challenge telah diimplementasikan sesuai instruksi modul. Hasil tangkapan layar (termasuk pagination dan error handling) dapat dilihat pada folder `screenshots/`.
+---
+
+## Hasil Praktikum & Screenshots
+
+### 1. Tampilan Awal & Paged List
+Tampilan saat aplikasi baru dijalankan dan menampilkan halaman pertama list post. (Sudah di-refactor menggunakan `PostTile`).
+![Tampilan Awal](screenshots/5_Paged_PostTile.png)
+
+### 2. Indikator Loading Pagination
+Tampilan saat men-scroll ke bawah dan indikator loading muncul sebelum memuat post tambahan.
+![Indikator Loading](screenshots/2_indikator_loading.png)
+
+### 3. Semua Data Termuat
+Tampilan saat data post sudah dimuat semuanya sampai ujung akhir list.
+![Semua Data Termuat](screenshots/3_semua_data_termuat.png)
+
+### 4. Detail Post (GoRouter)
+Tampilan saat salah satu post di klik, aplikasi menavigasikan halaman menggunakan GoRouter.
+![Detail Post](screenshots/5_Detail_Post.png)
+
+### 5. Hasil Unit Testing (Termasuk AI Challenge & Refactoring)
+Berikut adalah bukti berjalannya pengujian (Test) pada model (Null Safety Edge Case), error mapping, dan mock repository.
+
+**Test AI Challenge (Comments):**
+![Test AI Challenge](screenshots/4_AI_challenge_test.png)
+
+**Test Refactoring (Posts):**
+![Test Refactoring](screenshots/5_Refactoring_test.png)
 
 ---
 
