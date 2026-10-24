@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/local/note.dart';
 import '../data/repositories/note_repository.dart';
 import '../data/sync.dart';
+
 import 'package:go_router/go_router.dart';
+
 import '../widgets/note_tile.dart';
+import '../features/notes/domain/usecases/validate_note.dart';
 
 final noteRepositoryProvider = Provider((ref) => NoteRepository());
 
@@ -22,32 +26,38 @@ class NotesPage extends ConsumerWidget {
   void _showAddNoteDialog(BuildContext context, WidgetRef ref) {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    const validateNote = ValidateNote();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Catatan baru'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Judul',
-                  border: OutlineInputBorder(),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Judul',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => validateNote(value ?? ''),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: bodyController,
-                decoration: const InputDecoration(
-                  labelText: 'Isi (opsional)',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: bodyController,
+                  decoration: const InputDecoration(
+                    labelText: 'Isi (opsional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -56,15 +66,17 @@ class NotesPage extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (titleController.text.trim().isEmpty) return;
-                
-                await ref.read(noteRepositoryProvider).addNote(
+                if (!(formKey.currentState?.validate() ?? false)) return;
+
+                await ref
+                    .read(noteRepositoryProvider)
+                    .addNote(
                       title: titleController.text.trim(),
                       body: bodyController.text.trim(),
                     );
                 ref.invalidate(notesProvider);
                 ref.invalidate(dirtyCountProvider);
-                
+
                 if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Simpan'),
@@ -106,11 +118,18 @@ class NotesPage extends ConsumerWidget {
           if (isOffline)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               color: Colors.deepOrange.shade50,
               child: Row(
                 children: [
-                  const Icon(Icons.airplanemode_active, color: Colors.deepOrange, size: 20),
+                  const Icon(
+                    Icons.airplanemode_active,
+                    color: Colors.deepOrange,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
@@ -123,7 +142,10 @@ class NotesPage extends ConsumerWidget {
             ),
           // Sync Status Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
               children: [
                 dirtyCountAsync.when(
@@ -133,16 +155,22 @@ class NotesPage extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(
-                            isAllSynced ? Icons.cloud_done_outlined : Icons.cloud_queue,
+                            isAllSynced
+                                ? Icons.cloud_done_outlined
+                                : Icons.cloud_queue,
                             color: isAllSynced ? Colors.green : Colors.orange,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              isAllSynced ? 'Semua catatan sudah tersinkron' : '$count catatan belum tersinkron',
+                              isAllSynced
+                                  ? 'Semua catatan sudah tersinkron'
+                                  : '$count catatan belum tersinkron',
                               style: TextStyle(
-                                color: isAllSynced ? Colors.green : Colors.orange,
+                                color: isAllSynced
+                                    ? Colors.green
+                                    : Colors.orange,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -159,12 +187,16 @@ class NotesPage extends ConsumerWidget {
                     try {
                       final syncRepo = ref.read(syncRepositoryProvider);
                       final noteRepo = ref.read(noteRepositoryProvider);
-                      
+
                       // Set loading state maybe, but codelab uses simple await
                       final synced = await syncRepo.syncNotes(noteRepo);
                       if (context.mounted && synced > 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('$synced catatan berhasil disinkronkan.')),
+                          SnackBar(
+                            content: Text(
+                              '$synced catatan berhasil disinkronkan.',
+                            ),
+                          ),
                         );
                       }
                       ref.invalidate(dirtyCountProvider);
@@ -203,7 +235,9 @@ class NotesPage extends ConsumerWidget {
                         context.push('/note/${note.id}');
                       },
                       onDelete: () async {
-                        await ref.read(noteRepositoryProvider).deleteNote(note.id!);
+                        await ref
+                            .read(noteRepositoryProvider)
+                            .deleteNote(note.id!);
                         ref.invalidate(notesProvider);
                         ref.invalidate(dirtyCountProvider);
                       },
