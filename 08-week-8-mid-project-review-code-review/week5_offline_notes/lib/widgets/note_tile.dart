@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../data/local/note.dart';
 
 class NoteTile extends StatelessWidget {
@@ -64,7 +65,10 @@ class NoteTile extends StatelessWidget {
                       const SizedBox(width: 8),
                       if (note.dirty)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.shade50,
                             border: Border.all(color: Colors.orange),
@@ -73,7 +77,11 @@ class NoteTile extends StatelessWidget {
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.cloud_queue, size: 12, color: Colors.orange),
+                              Icon(
+                                Icons.cloud_queue,
+                                size: 12,
+                                color: Colors.orange,
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 'Belum tersinkron',

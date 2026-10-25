@@ -6,8 +6,8 @@ import 'package:week5_offline_notes/features/notes/domain/repositories/note_repo
 
 class NoteRepositoryImpl implements NoteRepository {
   NoteRepositoryImpl({required Future<Database> Function() openDb})
-      // ignore: prefer_initializing_formals
-      : _openDb = openDb;
+    // ignore: prefer_initializing_formals
+    : _openDb = openDb;
 
   final Future<Database> Function() _openDb;
 
@@ -48,8 +48,12 @@ class NoteRepositoryImpl implements NoteRepository {
       final now = DateTime.now();
       final id = await db.insert(
         'notes',
-        NoteModel(title: title, body: body, updatedAt: now, dirty: true)
-            .toMap(),
+        NoteModel(
+          title: title,
+          body: body,
+          updatedAt: now,
+          dirty: true,
+        ).toMap(),
       );
       return (
         note: Note(
@@ -62,10 +66,7 @@ class NoteRepositoryImpl implements NoteRepository {
         failure: null,
       );
     } catch (e) {
-      return (
-        note: null,
-        failure: LocalFailure('Gagal menyimpan catatan: $e'),
-      );
+      return (note: null, failure: LocalFailure('Gagal menyimpan catatan: $e'));
     }
   }
 
@@ -84,8 +85,9 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<({int count, Failure? failure})> countDirty() async {
     try {
       final db = await _openDb();
-      final rows = await db
-          .rawQuery('SELECT COUNT(*) AS c FROM notes WHERE dirty = 1');
+      final rows = await db.rawQuery(
+        'SELECT COUNT(*) AS c FROM notes WHERE dirty = 1',
+      );
       return (count: (rows.first['c'] as num?)?.toInt() ?? 0, failure: null);
     } catch (e) {
       return (count: 0, failure: LocalFailure('Gagal menghitung catatan: $e'));

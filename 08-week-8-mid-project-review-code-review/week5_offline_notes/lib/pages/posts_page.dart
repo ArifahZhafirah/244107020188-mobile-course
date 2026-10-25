@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/sync.dart';
 
 class PostsPage extends ConsumerWidget {
@@ -20,7 +21,10 @@ class PostsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Data API (cache-first)', style: TextStyle(fontSize: 18)),
+        title: const Text(
+          'Data API (cache-first)',
+          style: TextStyle(fontSize: 18),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -34,7 +38,10 @@ class PostsPage extends ConsumerWidget {
         children: [
           // Simulate Offline Toggle
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             color: Colors.white,
             child: Row(
               children: [
@@ -44,10 +51,16 @@ class PostsPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Simulasikan offline', style: TextStyle(fontWeight: FontWeight.w500)),
+                      const Text(
+                        'Simulasikan offline',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
                       Text(
                         'Cache lokal tetap tampil tanpa jaringan',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
@@ -61,12 +74,15 @@ class PostsPage extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           // Error Banner
           if (error != null)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               color: Colors.red.shade50,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,26 +98,35 @@ class PostsPage extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
           // Status Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             color: Colors.grey.shade100,
             child: Row(
               children: [
                 Icon(
-                  isFromNetwork ? Icons.cloud_download_outlined : Icons.sd_storage_outlined,
+                  isFromNetwork
+                      ? Icons.cloud_download_outlined
+                      : Icons.sd_storage_outlined,
                   size: 16,
                   color: isFromNetwork ? Colors.green : Colors.grey.shade700,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isFromNetwork ? 'Dari jaringan (tersimpan ke cache)' : 'Dari cache lokal',
+                    isFromNetwork
+                        ? 'Dari jaringan (tersimpan ke cache)'
+                        : 'Dari cache lokal',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isFromNetwork ? Colors.green : Colors.grey.shade700,
+                      color: isFromNetwork
+                          ? Colors.green
+                          : Colors.grey.shade700,
                     ),
                   ),
                 ),
@@ -112,9 +137,9 @@ class PostsPage extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           const Divider(height: 1),
-          
+
           // Posts List
           Expanded(
             child: postsAsync.when(
@@ -146,15 +171,24 @@ class PostsPage extends ConsumerWidget {
                           backgroundColor: Colors.blue.shade50,
                           child: Text(
                             post.id.toString(),
-                            style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: Colors.blue.shade700,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.w500)),
+                        title: Text(
+                          post.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
                         subtitle: Text(
                           post.body,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ),
                     );

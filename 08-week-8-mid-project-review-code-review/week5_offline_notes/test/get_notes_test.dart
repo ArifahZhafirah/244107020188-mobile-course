@@ -30,8 +30,7 @@ class FakeNoteRepository implements NoteRepository {
   Future<({Note? note, Failure? failure})> addNote({
     required String title,
     String body = '',
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<Failure?> deleteNote(int id) => throw UnimplementedError();
@@ -46,9 +45,9 @@ class FakeNoteRepository implements NoteRepository {
 
 void main() {
   test('GetNotes meneruskan daftar dari repository', () async {
-    final repo = FakeNoteRepository(items: [
-      Note(title: 'A', updatedAt: DateTime(2026, 9, 27)),
-    ]);
+    final repo = FakeNoteRepository(
+      items: [Note(title: 'A', updatedAt: DateTime(2026, 9, 27))],
+    );
 
     final result = await GetNotes(repo).call();
 
@@ -67,8 +66,7 @@ void main() {
     expect(result.notes, isEmpty);
   });
 
-  test('GetNotes mengembalikan daftar kosong bila repository kosong',
-      () async {
+  test('GetNotes mengembalikan daftar kosong bila repository kosong', () async {
     final repo = FakeNoteRepository();
 
     final result = await GetNotes(repo).call();
