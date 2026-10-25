@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/prefs.dart';
 
 final prefsRepositoryProvider = Provider((ref) => PrefsRepository());
 
-final darkModeProvider =
-    AsyncNotifierProvider<DarkModeNotifier, bool>(DarkModeNotifier.new);
+final darkModeProvider = AsyncNotifierProvider<DarkModeNotifier, bool>(
+  DarkModeNotifier.new,
+);
 
 class DarkModeNotifier extends AsyncNotifier<bool> {
   @override
@@ -44,9 +46,7 @@ class SettingsPage extends ConsumerWidget {
     final lastOpenedAsync = ref.watch(lastOpenedProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pengaturan'),
-      ),
+      appBar: AppBar(title: const Text('Pengaturan')),
       body: ListView(
         children: [
           SwitchListTile(

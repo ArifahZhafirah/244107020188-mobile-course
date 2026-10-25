@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/local/note.dart';
 import '../pages/notes_page.dart'; // To access noteRepositoryProvider
 
@@ -17,9 +18,7 @@ class NoteDetailPage extends ConsumerWidget {
     final noteAsync = ref.watch(noteDetailProvider(noteId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detail Catatan'),
-      ),
+      appBar: AppBar(title: const Text('Detail Catatan')),
       body: noteAsync.when(
         data: (note) {
           if (note == null) {
