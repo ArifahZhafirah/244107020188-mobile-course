@@ -23,68 +23,8 @@ final dirtyCountProvider = FutureProvider<int>((ref) async {
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
 
-  void _showAddNoteDialog(BuildContext context, WidgetRef ref) {
-    final titleController = TextEditingController();
-    final bodyController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    const validateNote = ValidateNote();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Catatan baru'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Judul',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) => validateNote(value ?? ''),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: bodyController,
-                  decoration: const InputDecoration(
-                    labelText: 'Isi (opsional)',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (!(formKey.currentState?.validate() ?? false)) return;
-
-                await ref
-                    .read(noteRepositoryProvider)
-                    .addNote(
-                      title: titleController.text.trim(),
-                      body: bodyController.text.trim(),
-                    );
-                ref.invalidate(notesProvider);
-                ref.invalidate(dirtyCountProvider);
-
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        );
-      },
-    );
+  void _showAddNoteDialog(BuildContext context) {
+    showDialog(context: context, builder: (_) => const AddNoteDialog());
   }
 
   @override
@@ -252,10 +192,99 @@ class NotesPage extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddNoteDialog(context, ref),
+        onPressed: () => _showAddNoteDialog(context),
         icon: const Icon(Icons.add),
         label: const Text('Catatan'),
       ),
+    );
+  }
+}
+
+class AddNoteDialog extends ConsumerStatefulWidget {
+  const AddNoteDialog({super.key});
+
+  @override
+  ConsumerState<AddNoteDialog> createState() => _AddNoteDialogState();
+}
+
+class _AddNoteDialogState extends ConsumerState<AddNoteDialog> {
+  static const _validateNote = ValidateNote();
+
+  final _titleController = TextEditingController();
+  final _bodyController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() => _isSaving = true);
+    try {
+      await ref
+          .read(noteRepositoryProvider)
+          .addNote(
+            title: _titleController.text.trim(),
+            body: _bodyController.text.trim(),
+          );
+      ref.invalidate(notesProvider);
+      ref.invalidate(dirtyCountProvider);
+
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal menyimpan catatan: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Catatan baru'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _titleController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              decoration: const InputDecoration(
+                labelText: 'Judul',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) => _validateNote(value ?? ''),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _bodyController,
+              decoration: const InputDecoration(
+                labelText: 'Isi (opsional)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          onPressed: _isSaving ? null : _save,
+          child: const Text('Simpan'),
+        ),
+      ],
     );
   }
 }
