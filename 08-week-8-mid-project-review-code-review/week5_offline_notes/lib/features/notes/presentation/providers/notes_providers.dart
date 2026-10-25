@@ -51,5 +51,4 @@ class NotesActions {
   }
 }
 
-final notesActionsProvider =
-    Provider<NotesActions>((ref) => NotesActions(ref));
+final notesActionsProvider = Provider<NotesActions>((ref) => NotesActions(ref));

@@ -9,6 +9,7 @@ import 'pages/notes_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/posts_page.dart';
 import 'pages/note_detail_page.dart';
+
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -21,11 +22,7 @@ void main() {
     databaseFactory = databaseFactoryFfi;
   }
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -67,18 +64,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const NotesPage(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const NotesPage()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
       ),
-      GoRoute(
-        path: '/posts',
-        builder: (context, state) => const PostsPage(),
-      ),
+      GoRoute(path: '/posts', builder: (context, state) => const PostsPage()),
       GoRoute(
         path: '/note/:id',
         builder: (context, state) {
