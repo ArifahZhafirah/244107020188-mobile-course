@@ -8,6 +8,7 @@ import '../data/sync.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/note_tile.dart';
+import '../features/notes/domain/usecases/validate_note.dart';
 
 final noteRepositoryProvider = Provider((ref) => NoteRepository());
 
@@ -25,32 +26,38 @@ class NotesPage extends ConsumerWidget {
   void _showAddNoteDialog(BuildContext context, WidgetRef ref) {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    const validateNote = ValidateNote();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Catatan baru'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Judul',
-                  border: OutlineInputBorder(),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Judul',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => validateNote(value ?? ''),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: bodyController,
-                decoration: const InputDecoration(
-                  labelText: 'Isi (opsional)',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: bodyController,
+                  decoration: const InputDecoration(
+                    labelText: 'Isi (opsional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -59,7 +66,7 @@ class NotesPage extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (titleController.text.trim().isEmpty) return;
+                if (!(formKey.currentState?.validate() ?? false)) return;
 
                 await ref
                     .read(noteRepositoryProvider)
