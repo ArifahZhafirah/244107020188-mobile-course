@@ -10,16 +10,6 @@
 
 ## Review untuk pasangan
 
-Reviewer mengisi kolom temuan berdasarkan kode dan diff PR yang benar-benar diperiksa. Jangan mengisi temuan berdasarkan dugaan atau contoh di dokumen ini.
-
-| Kategori wajib | Observasi -> dampak -> usulan konkret | File/baris | Isi reviewer |
-| --- | --- | --- | --- |
-| Kebenaran 1 (null/state/error path/edge case) |  |  |  |
-| Kebenaran 2 (null/state/error path/edge case) |  |  |  |
-| Arsitektur (lintas layer/DI/model UI) |  |  |  |
-| Test (kasus sukses/gagal) |  |  |  |
-| Keterbacaan |  |  |  |
-
 ### Contoh komentar
 
 **Kurang:** “Validasinya kurang bagus.”

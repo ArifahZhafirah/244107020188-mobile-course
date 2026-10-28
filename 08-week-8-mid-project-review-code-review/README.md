@@ -204,8 +204,6 @@ Screenshot yang tersedia di folder `screenshots/` adalah bukti dialog tambah cat
 
 ![Validasi judul kosong pada dialog Catatan baru](screenshots/1_validasi_judul_kosong.jpeg)
 
-*Dialog mempertahankan field judul kosong dan menampilkan pesan “Judul catatan tidak boleh kosong.”*
-
 ## Referensi
 
 - [Codelab #08 — Mid Project Review & Code Review](https://jti-polinema.github.io/flutter-codelab/08-minggu-8-mid-project-review-code-review/)
