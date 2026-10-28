@@ -51,12 +51,15 @@ Alasan/komentar keputusan: ____________________
 
 ## Tindak lanjut
 
-Isi setelah komentar reviewer sungguhan diterima. Jangan mengarang atau menganggap temuan contoh self-review sebagai komentar reviewer pasangan.
+Belum ada komentar reviewer sejawat yang ditempel. Tabel berikut mencatat tindak lanjut self-review awal, bukan komentar pasangan.
 
 | Komentar reviewer | Tindakan author | Status (selesai/ditolak + alasan) |
 | --- | --- | --- |
-|  |  |  |
-|  |  |  |
+| Kebenaran — state/null: form state null membuat Simpan berhenti tanpa pesan. | `_save` memeriksa `FormState` secara eksplisit; jika belum tersedia, memberi SnackBar dan tidak meneruskan penyimpanan. | Selesai — guard memberi umpan balik tanpa memanggil aksi simpan. |
+| Kebenaran — error path: kegagalan simpan perlu ditangani tanpa menutup dialog atau membocorkan exception ke UI. | Simpan melalui `NotesActions`; kegagalan menampilkan pesan umum, mencatat detail diagnostik, dan mempertahankan dialog. | Selesai — kegagalan repository dan exception tidak ditampilkan mentah kepada pengguna. |
+| Arsitektur: UI masih menggunakan provider/repository notes lama sementara provider feature-first tersedia. | Daftar, tambah, hapus, detail, dan `NoteTile` kini menggunakan provider/entity feature-first. Repository lama diberi provider khusus dan hanya dipakai untuk sinkronisasi. | Selesai sebagian — alur CRUD utama sudah feature-first; migrasi repository sinkronisasi tetap pekerjaan terpisah. |
+| Test: belum ada widget test untuk jalur sukses dan kegagalan penyimpanan. | Tambah widget test untuk invalid tidak memanggil repository, valid memanggil repository, dan failure menampilkan pesan aman. | Selesai — ketiga jalur tersebut memiliki test widget. |
+| Keterbacaan: import dan format kode belum konsisten. | Kelompokkan import yang disentuh dan jalankan formatter Dart pada `lib` serta `test`. | Selesai — `dart format --set-exit-if-changed lib test` melaporkan 22 file, 0 berubah. |
 
 Untuk setiap baris, isi status dengan `Selesai — <perubahan yang dilakukan>` atau `Ditolak — <alasan teknis dan bukti>`. Setelah semua komentar ditangani:
 

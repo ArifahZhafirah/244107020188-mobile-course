@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/local/note.dart';
-import '../pages/notes_page.dart'; // To access noteRepositoryProvider
-
-final noteDetailProvider = FutureProvider.family<Note?, int>((ref, id) async {
-  return ref.watch(noteRepositoryProvider).getNoteById(id);
-});
+import '../features/notes/presentation/providers/notes_providers.dart';
 
 class NoteDetailPage extends ConsumerWidget {
   final int noteId;
@@ -15,7 +10,7 @@ class NoteDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final noteAsync = ref.watch(noteDetailProvider(noteId));
+    final noteAsync = ref.watch(noteByIdProvider(noteId));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Detail Catatan')),
