@@ -5,12 +5,10 @@
 - Branch sumber: `feat/notes-validation`
 - Target: `develop`
 - Issue: #3
-- Reviewer: ____________________
-- Tanggal review: ____________________
+- Reviewer: Angel
+- Tanggal review: 27 Oktober 2026
 
 ## Review untuk pasangan
-
-### Contoh komentar
 
 **Kurang:** “Validasinya kurang bagus.”
 
@@ -18,10 +16,9 @@
 
 ### Keputusan reviewer
 
-- [ ] Approve
+- [x] Approve
 - [ ] Request changes
 
-Alasan/komentar keputusan: ____________________
 
 ## Self-review awal
 
