@@ -6,8 +6,10 @@ Solusi: validasi di use case + pesan error di UI.
 Cara uji: 1) tambah catatan kosong -> error muncul. 2) flutter test test/validate_note_test.dart
 Closes #3
 
-Screenshot:
-- [Tempel screenshot pesan validasi judul kosong di sini]
+# Screenshot:
+
+
+![mini](/08-week-8-mid-project-review-code-review/screenshots/1_validasi_judul_kosong.jpeg)
 
 ## Catatan verifikasi
 
