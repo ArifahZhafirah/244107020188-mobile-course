@@ -204,13 +204,4 @@ Screenshot yang tersedia di folder `screenshots/` adalah bukti dialog tambah cat
 
 ![Validasi judul kosong pada dialog Catatan baru](screenshots/1_validasi_judul_kosong.jpeg)
 
-## Referensi
 
-- [Codelab #08 — Mid Project Review & Code Review](https://jti-polinema.github.io/flutter-codelab/08-minggu-8-mid-project-review-code-review/)
-- [Slide Week 8 — Mid Project Review & Code Review](https://jti-polinema.github.io/flutter-codelab/00-slides/Week_08_Mid_Project_Review_Code_Review.html)
-- [Atlassian — Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-- [GitHub — About pull request reviews](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews)
-- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
-- [Flutter — Analyze your source code](https://docs.flutter.dev/tools/analysis)
-- [Dart — Linter rules](https://dart.dev/tools/linter-rules)
-- [GitHub Actions — Understanding workflows](https://docs.github.com/en/actions/writing-workflows/about-workflows)
