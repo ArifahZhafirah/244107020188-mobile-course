@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../data/local/note.dart';
-import '../data/repositories/note_repository.dart';
-import '../data/sync.dart';
-
 import 'package:go_router/go_router.dart';
 
+import '../data/sync.dart';
+import '../data/repositories/note_repository.dart';
+import '../features/notes/presentation/providers/notes_providers.dart'
+    as feature_notes;
 import '../widgets/note_tile.dart';
 import '../features/notes/domain/usecases/validate_note.dart';
 
-final noteRepositoryProvider = Provider((ref) => NoteRepository());
-
-final notesProvider = FutureProvider<List<Note>>((ref) async {
-  return ref.watch(noteRepositoryProvider).fetchNotes();
-});
-
-final dirtyCountProvider = FutureProvider<int>((ref) async {
-  return ref.watch(noteRepositoryProvider).countDirty();
-});
+final syncNoteRepositoryProvider = Provider((ref) => NoteRepository());
 
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
@@ -89,8 +80,8 @@ class NotesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notesAsync = ref.watch(notesProvider);
-    final dirtyCountAsync = ref.watch(dirtyCountProvider);
+    final notesAsync = ref.watch(feature_notes.notesProvider);
+    final dirtyCountAsync = ref.watch(feature_notes.dirtyCountProvider);
     final isOffline = ref.watch(forceOfflineProvider);
 
     return Scaffold(
@@ -186,7 +177,7 @@ class NotesPage extends ConsumerWidget {
                   onPressed: () async {
                     try {
                       final syncRepo = ref.read(syncRepositoryProvider);
-                      final noteRepo = ref.read(noteRepositoryProvider);
+                      final noteRepo = ref.read(syncNoteRepositoryProvider);
 
                       // Set loading state maybe, but codelab uses simple await
                       final synced = await syncRepo.syncNotes(noteRepo);
@@ -199,8 +190,8 @@ class NotesPage extends ConsumerWidget {
                           ),
                         );
                       }
-                      ref.invalidate(dirtyCountProvider);
-                      ref.invalidate(notesProvider);
+                      ref.invalidate(feature_notes.dirtyCountProvider);
+                      ref.invalidate(feature_notes.notesProvider);
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -235,11 +226,28 @@ class NotesPage extends ConsumerWidget {
                         context.push('/note/${note.id}');
                       },
                       onDelete: () async {
-                        await ref
-                            .read(noteRepositoryProvider)
-                            .deleteNote(note.id!);
-                        ref.invalidate(notesProvider);
-                        ref.invalidate(dirtyCountProvider);
+                        final id = note.id;
+                        if (id == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Catatan tidak dapat dihapus.'),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final error = await ref
+                            .read(feature_notes.notesActionsProvider)
+                            .delete(id);
+                        if (error != null && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Gagal menghapus catatan. Coba lagi.',
+                              ),
+                            ),
+                          );
+                        }
                       },
                     );
                   },
@@ -256,6 +264,108 @@ class NotesPage extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('Catatan'),
       ),
+    );
+  }
+}
+
+class AddNoteDialog extends ConsumerStatefulWidget {
+  const AddNoteDialog({super.key});
+
+  @override
+  ConsumerState<AddNoteDialog> createState() => _AddNoteDialogState();
+}
+
+class _AddNoteDialogState extends ConsumerState<AddNoteDialog> {
+  static const _validateNote = ValidateNote();
+
+  final _titleController = TextEditingController();
+  final _bodyController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final formState = _formKey.currentState;
+    if (formState == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Form belum siap. Coba lagi.')),
+      );
+      return;
+    }
+    if (!formState.validate()) return;
+
+    setState(() => _isSaving = true);
+    try {
+      final error = await ref
+          .read(feature_notes.notesActionsProvider)
+          .add(_titleController.text.trim(), _bodyController.text.trim());
+      if (error != null) {
+        debugPrint('Failed to save note: $error');
+        if (!mounted) return;
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal menyimpan catatan. Coba lagi.')),
+        );
+        return;
+      }
+
+      if (mounted) Navigator.pop(context);
+    } catch (error, stackTrace) {
+      debugPrint('Failed to save note: $error\n$stackTrace');
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menyimpan catatan. Coba lagi.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Catatan baru'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _titleController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              decoration: const InputDecoration(
+                labelText: 'Judul',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) => _validateNote(value ?? ''),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _bodyController,
+              decoration: const InputDecoration(
+                labelText: 'Isi (opsional)',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          onPressed: _isSaving ? null : _save,
+          child: const Text('Simpan'),
+        ),
+      ],
     );
   }
 }

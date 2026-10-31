@@ -1,0 +1,9 @@
+# Error Umum pada PR dan Code Review
+
+| Gejala | Penyebab umum | Solusi | Pernah saya alami di project ini? |
+| --- | --- | --- | --- |
+| PR 800 baris tak kunjung direview | Banyak fitur atau refactor berbeda digabung menjadi satu PR, sehingga sulit dipahami dan ditinjau. | Pecah berdasarkan tujuan menjadi PR kecil berurutan; jaga tiap PR di bawah 300 baris perubahan dan targetkan waktu review kurang dari 15 menit. | Tidak terbukti. PR #1 pada repositori tercatat dengan 225 penambahan dan 32 penghapusan; tidak ada bukti PR 800 baris di riwayat yang diperiksa. |
+| Konflik merge berulang | Branch berumur panjang dan jarang diselaraskan dengan branch target. | Perbarui branch fitur secara rutin dari `develop`, selesaikan konflik segera, dan jaga umur branch tetap pendek. | Tidak ada bukti konflik berulang di riwayat yang diperiksa. |
+| Review hanya debat spasi | Format kode tidak otomatis dijaga dan komentar review berfokus pada hal yang dapat diperiksa mesin. | Jalankan `dart format` dan wajibkan CI menolak perubahan yang tidak terformat; gunakan review manusia untuk kebenaran dan desain. | Tidak ada bukti review berdebat soal spasi di riwayat yang diperiksa. |
+| Approve tapi bug lolos | Reviewer hanya membaca diff tanpa menjalankan test atau mencoba alur utama. | Jalankan `flutter analyze` dan `flutter test`; reviewer checkout perubahan, jalankan aplikasi, dan lakukan uji manual dengan bukti. | Tidak ada bukti bug lolos setelah approve di riwayat yang diperiksa. |
+| Saran AI merusak arsitektur | Saran AI diterapkan tanpa memastikan dependency rule dan bukti masalah. | Verifikasi tiap temuan terhadap kode/test; tolak usulan yang membuat domain mengimpor Flutter, Dio, atau SQLite, dan dokumentasikan alasan teknis. | Tidak terbukti. Review AI didokumentasikan, tetapi tidak ada bukti saran yang melanggar dependency rule diterapkan. |

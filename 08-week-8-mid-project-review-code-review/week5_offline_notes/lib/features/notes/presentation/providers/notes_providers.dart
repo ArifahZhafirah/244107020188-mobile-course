@@ -24,6 +24,12 @@ final dirtyCountProvider = FutureProvider<int>((ref) async {
   return result.count;
 });
 
+final noteByIdProvider = FutureProvider.family<Note?, int>((ref, id) async {
+  final result = await ref.watch(noteRepositoryProvider).getNoteById(id);
+  if (result.failure != null) throw Exception(result.failure!.message);
+  return result.note;
+});
+
 // Aksi dari UI. Halaman memanggil ini, bukan repository.
 // Mengembalikan pesan error (null bila sukses) agar UI bisa menampilkan
 // SnackBar tanpa perlu mengenal Failure.
